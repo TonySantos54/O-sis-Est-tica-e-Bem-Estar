@@ -1,0 +1,315 @@
+
+---
+
+## 🧩 App.jsx Atualizado com Mais Funcionalidades
+
+Agora atualizo o código do `App.jsx` com:
+
+- Login fake
+- Persistência no `localStorage`
+- Calendário de reservas simples (com seleção de data/hora)
+- Dados salvos entre sessões
+
+```jsx
+import React, { useState, useEffect } from "react";
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState("salas");
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [hour, setHour] = useState("");
+
+  // Dados mockados
+  const rooms = [
+    {
+      id: 1,
+      name: "Sala Zen",
+      description: "Espaço tranquilo e iluminado para relaxamento e tratamentos leves.",
+      capacity: 6,
+      pricePerHour: 75,
+    },
+    {
+      id: 2,
+      name: "Sala Sol",
+      description: "Ambiente energético com equipamentos avançados para estética corporal.",
+      capacity: 8,
+      pricePerHour: 90,
+    },
+    {
+      id: 3,
+      name: "Sala Lua",
+      description: "Sala privativa ideal para tratamentos faciais e personalizados.",
+      capacity: 2,
+      pricePerHour: 100,
+    },
+  ];
+
+  // Dados persistentes no localStorage
+  const [reservations, setReservations] = useState(() => {
+    const saved = localStorage.getItem("reservations");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [financialData, setFinancialData] = useState(() => {
+    const saved = localStorage.getItem("financialData");
+    return saved
+      ? JSON.parse(saved)
+      : {
+          income: 12500,
+          expenses: 8300,
+          balance: 4200,
+        };
+  });
+
+  // Salva dados no localStorage
+  useEffect(() => {
+    localStorage.setItem("reservations", JSON.stringify(reservations));
+  }, [reservations]);
+
+  useEffect(() => {
+    localStorage.setItem("financialData", JSON.stringify(financialData));
+  }, [financialData]);
+
+  // Fake login
+  const handleLogin = () => {
+    if (email && password) {
+      setUser({ email });
+      setEmail("");
+      setPassword("");
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  const handleReserve = () => {
+    if (!date || !hour) return alert("Selecione data e hora.");
+    const reservation = { ...selectedRoom, date, hour };
+    setReservations([...reservations, reservation]);
+    setSelectedRoom(null);
+    alert("Sala reservada com sucesso!");
+  };
+
+  return (
+    <div className="min-h-screen bg-rose-50 text-gray-800">
+      {/* Header */}
+      <header className="bg-rose-900 text-white p-6 shadow-lg">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight">Oásis Estética e Bem Estar</h1>
+          {user ? (
+            <button onClick={handleLogout} className="bg-rose-700 px-4 py-2 rounded hover:bg-rose-600">
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => setActiveTab("login")}
+              className="bg-rose-700 px-4 py-2 rounded hover:bg-rose-600"
+            >
+              Login
+            </button>
+          )}
+        </div>
+      </header>
+
+      <main className="container mx-auto p-6">
+        {!user ? (
+          activeTab === "login" && (
+            <section className="max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
+              <h2 className="text-2xl font-bold text-rose-900 mb-4">Entrar</h2>
+              <input
+                type="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded mb-4"
+              />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded mb-4"
+              />
+              <button
+                onClick={handleLogin}
+                className="w-full bg-rose-900 text-white py-2 rounded hover:bg-rose-800"
+              >
+                Acessar
+              </button>
+            </section>
+          )
+        ) : (
+          <>
+            <nav className="flex space-x-4 my-6">
+              <button
+                onClick={() => setActiveTab("salas")}
+                className={`px-4 py-2 rounded-md transition ${
+                  activeTab === "salas" ? "bg-rose-700 text-white" : "bg-rose-200 text-rose-900"
+                }`}
+              >
+                Salas
+              </button>
+              <button
+                onClick={() => setActiveTab("financeiro")}
+                className={`px-4 py-2 rounded-md transition ${
+                  activeTab === "financeiro"
+                    ? "bg-rose-700 text-white"
+                    : "bg-rose-200 text-rose-900"
+                }`}
+              >
+                Financeiro
+              </button>
+              <button
+                onClick={() => setActiveTab("reservas")}
+                className={`px-4 py-2 rounded-md transition ${
+                  activeTab === "reservas"
+                    ? "bg-rose-700 text-white"
+                    : "bg-rose-200 text-rose-900"
+                }`}
+              >
+                Reservas
+              </button>
+            </nav>
+
+            {activeTab === "salas" && (
+              <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {rooms.map((room) => (
+                  <div
+                    key={room.id}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden transform transition hover:scale-105 duration-300"
+                  >
+                    <div className="p-6">
+                      <h2 className="text-2xl font-semibold text-rose-900 mb-2">{room.name}</h2>
+                      <p className="text-sm text-gray-600 mb-4">{room.description}</p>
+                      <div className="flex justify-between text-sm text-gray-500 mb-4">
+                        <span>Capacidade: {room.capacity} pessoas</span>
+                        <span>R$ {room.pricePerHour}/hora</span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedRoom(room)}
+                        className="w-full bg-rose-900 text-white py-2 px-4 rounded-md hover:bg-rose-800 transition"
+                      >
+                        Reservar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {activeTab === "financeiro" && (
+              <section className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+                <h2 className="text-2xl font-bold text-rose-900 mb-6">Painel Financeiro</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-rose-50 p-4 rounded-lg text-center">
+                    <p className="text-sm text-gray-500">Receita Total</p>
+                    <p className="text-2xl font-semibold text-green-600">
+                      R$ {financialData.income.toLocaleString("pt-BR")}
+                    </p>
+                  </div>
+                  <div className="bg-rose-50 p-4 rounded-lg text-center">
+                    <p className="text-sm text-gray-500">Despesas</p>
+                    <p className="text-2xl font-semibold text-red-600">
+                      R$ {financialData.expenses.toLocaleString("pt-BR")}
+                    </p>
+                  </div>
+                  <div className="bg-rose-50 p-4 rounded-lg text-center">
+                    <p className="text-sm text-gray-500">Saldo Final</p>
+                    <p
+                      className={`text-2xl font-semibold ${
+                        financialData.balance >= 0 ? "text-emerald-600" : "text-red-600"
+                      }`}
+                    >
+                      R$ {financialData.balance.toLocaleString("pt-BR")}
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {activeTab === "reservas" && (
+              <section className="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+                <h2 className="text-2xl font-bold text-rose-900 mb-4">Minhas Reservas</h2>
+                {reservations.length === 0 ? (
+                  <p>Você ainda não fez nenhuma reserva.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {reservations.map((r, i) => (
+                      <li key={i} className="border p-4 rounded-md">
+                        <strong>{r.name}</strong> - {r.date} às {r.hour}h
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+
+            {/* Modal de Reserva */}
+            {selectedRoom && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl max-w-lg w-full p-6 animate-fadeIn">
+                  <h2 className="text-2xl font-bold text-rose-900 mb-4">{selectedRoom.name}</h2>
+                  <p className="mb-4">{selectedRoom.description}</p>
+                  <div className="mb-4">
+                    <label className="block mb-2">Data:</label>
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block mb-2">Hora:</label>
+                    <input
+                      type="time"
+                      value={hour}
+                      onChange={(e) => setHour(e.target.value)}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  <button
+                    onClick={handleReserve}
+                    className="w-full bg-rose-900 text-white py-2 rounded-md hover:bg-rose-800 transition"
+                  >
+                    Confirmar Reserva
+                  </button>
+                  <button
+                    onClick={() => setSelectedRoom(null)}
+                    className="mt-2 text-red-600"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      <footer className="bg-rose-900 text-white text-center py-6 mt-12">
+        <p className="text-sm">&copy; 2025 Oásis Estética e Bem Estar. Todos os direitos reservados.</p>
+      </footer>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  );
+}

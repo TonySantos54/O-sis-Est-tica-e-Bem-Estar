@@ -1,0 +1,5 @@
+ID_Lancamento,Data,Descrição,Tipo,Valor,Categoria
+1,2025-05-01,Entrada - Sessão,Entrada,200,Atendimento
+2,2025-05-05,Saída - Produto,Saída,50,Produtos
+3,2025-05-10,Entrada - Sessão,Entrada,250,Atendimento
+4,2025-05-15,Saída - Aluguel,Saída,1000,Despesas Fixas

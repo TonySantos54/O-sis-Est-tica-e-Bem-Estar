@@ -1,0 +1,6 @@
+"homepage": "https://seu-usuario.github.io/oasis-estetica-bemestar ",
+"scripts": {
+  "build": "vite build",
+  "preview": "vite preview",
+  "deploy": "vite build && gh-pages -d dist"
+}

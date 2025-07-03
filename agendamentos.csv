@@ -1,0 +1,5 @@
+ID_Agendamento,Data,Hora,Cliente,ID_Profissional,ID_Sala,Procedimento
+1,2025-05-19,10:00,Ana Paula,1,1,Sessão Tântrica
+2,2025-05-20,11:30,Bruno Costa,2,2,Massagem Relaxante
+3,2025-05-21,14:00,Carla Dias,1,1,Sessão Tântrica
+4,2025-05-22,16:00,Eduardo Lima,3,3,Atendimento Psicológico
